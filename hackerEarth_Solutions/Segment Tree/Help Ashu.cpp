@@ -1,102 +1,117 @@
 #include<bits/stdc++.h>
 using namespace std;
-#define int long long
-int arr[100006];
-int ste[4*100006]={0};
-int sto[4*100006]={0};
+typedef pair<int,int> PI;
+const int maxN=1e5+6;
+int arr[maxN];
+PI st[4*maxN];
 void build(int si,int ss,int se){
 	if(ss==se){
-		if(arr[ss]%2==0){
-			ste[si]=1;
+		if(arr[ss]%2==1){
+			st[si]={1,0};
 		}
 		else{
-			sto[si]=1;
+			st[si]={0,1};
 		}
 		return;
 	}
-	int mid = ss+ (se-ss)/2;
+	int mid = ss + (se-ss)/2;
 	build(2*si,ss,mid);
 	build(2*si+1,mid+1,se);
-	ste[si]=ste[2*si]+ste[2*si+1];
-	sto[si]=sto[2*si]+sto[2*si+1];
-	return;
+	st[si].first = st[2*si].first + st[2*si+1].first;
+	st[si].second = st[2*si].second + st[2*si+1].second;
 }
-int queryeven(int si,int ss,int se,int qs,int qe){
-	if(qs>se||qe<ss){
-		return 0;
-	}
-	if(qs<=ss && qe>=se){
-		return ste[si];
-	}
-	int mid = ss + (se-ss)/2;
-	int l = queryeven(2*si,ss,mid,qs,qe);
-	int r = queryeven(2*si+1,mid+1,se,qs,qe);
-	return l+r;
-}
-int queryodd(int si,int ss,int se,int qs,int qe){
-	if(qs>se||qe<ss){
-		return 0;
-	}
-	if(qs<=ss && qe>=se){
-		return sto[si];
-	}
-	int mid = ss + (se-ss)/2;
-	int l = queryodd(2*si,ss,mid,qs,qe);
-	int r = queryodd(2*si+1,mid+1,se,qs,qe);
-	return l+r;
-}
-void update(int si,int ss,int se,int qi,int f){
+void update(int si,int ss,int se,int qi,int val){
 	if(ss==se){
-		if(f==1){
-			sto[si]=1;
-			ste[si]=0;	
+		if(arr[qi]%2==1){
+			st[si]={0,1};
 		}
 		else{
-			sto[si]=0;
-			ste[si]=1;	
+			st[si]={1,0};
 		}
+		arr[qi]=val;
 		return;
 	}
-	
 	int mid = ss + (se-ss)/2;
 	if(qi<=mid){
-		update(2*si,ss,mid,qi,f);	
+		update(2*si,ss,mid,qi,val);
 	}
 	else{
-		update(2*si+1,mid+1,se,qi,f);
+		update(2*si+1,mid+1,se,qi,val);
 	}
-	sto[si]=sto[2*si]+sto[2*si+1];
-	ste[si]=ste[2*si]+ste[2*si+1];
+	st[si].first = st[2*si].first + st[2*si+1].first;
+	st[si].second = st[2*si].second + st[2*si+1].second;
 }
-int32_t main(){
-	memset(arr,0,sizeof(arr));
-	memset(ste,0,sizeof(ste));
-	memset(sto,0,sizeof(sto));
+int query(int si,int ss,int se,int qs,int qe,int f){
+	if(qs>se || qe<ss){
+		return 0;
+	}
+	if(qs<=ss && qe>=se){
+		if(f==0)
+		return st[si].second;
+		else{
+			return st[si].first;
+		}
+	}
+	int mid = ss + (se-ss)/2;
+	int l = query(2*si,ss,mid,qs,qe,f);
+	int r = query(2*si+1,mid+1,se,qs,qe,f);
+	return l+r;
+}
+// int queryeven(int si,int ss,int se,int qs,int qe){
+// 	if(qs>se || qe<ss){
+// 		return 0;
+// 	}
+// 	if(qs<=ss && qe>=se){
+// 		return st[si].second;
+// 	}
+// 	int mid = ss + (se-ss)/2;
+// 	int l = queryeven(2*si,ss,mid,qs,qe);
+// 	int r = queryeven(2*si+1,mid+1,se,qs,qe);
+// 	return l+r;
+// }
+// int queryodd(int si,int ss,int se,int qs,int qe){
+// 	if(qs>se || qe<ss){
+// 		return 0;
+// 	}
+// 	if(qs<=ss && qe>=se){
+// 		return st[si].first;
+// 	}
+// 	int mid = ss + (se-ss)/2;
+// 	int l = queryodd(2*si,ss,mid,qs,qe);
+// 	int r = queryodd(2*si+1,mid+1,se,qs,qe);
+// 	return l+r;
+// }
+int main(){
 	int n;
 	cin>>n;
 	for(int i=1;i<=n;i++){
 		cin>>arr[i];
 	}
-    build(1,1,n);
+	build(1,1,n);
 	int q;
 	cin>>q;
 	while(q--){
 		int x;
 		cin>>x;
-		if(x==1){
-			int l,r;
-			cin>>l>>r;
-			cout<<queryeven(1,1,n,l,r)<<endl;
+		if(x==0){
+			int i,val;
+			cin>>i>>val;
+			if(arr[i]%2==val%2){
+				continue;
+			}
+			else{
+				update(1,1,n,i,val);
+			}
 		}
-		else if(x==2){
+		else if(x==1){
 			int l,r;
 			cin>>l>>r;
-			cout<<queryodd(1,1,n,l,r)<<endl;
+			cout<<query(1,1,n,l,r,0)<<endl;
 		}
 		else{
-			int qi,val;
-			cin>>qi>>val;
-			update(1,1,n,qi,val%2);
+			int l,r;
+			cin>>l>>r;
+			cout<<query(1,1,n,l,r,1)<<endl;
 		}
 	}
 }
