@@ -1,187 +1,155 @@
-//implementation of dequeue using circular array
+//implementation of deque using circular array
 #include<bits/stdc++.h>
 using namespace std;
 #define MAX 100
 class Deque{
 	int arr[MAX];
-	int f;
-	int r;
+	int front;
+	int rear;
 	int size;
 	public:
 		Deque(int s){
-			f=-1;
-			r=-1;
-			size=s;
+			front = -1;
+			rear = 0;
+			size = s;
 		}
-		void insertFront(int x);
-		void insertRear(int x);
-		void deleteFront();
-		void deleteRear();
+		void insertfront(int key);
+		void insertrear(int key);
+		void deletefront();
+		void deleterear();
+		bool isFull();
+		bool isEmpty();
 		int getFront();
 		int getRear();
-		bool isEmpty();
-		bool isFull();
 };
-bool Deque::isEmpty(){
-	if(f==-1){
-		return true;
+void Deque::insertrear(int key){
+	//if deque is full or not
+	if(isFull()){
+		cout<<"Deque is full\n";
+		return;
+	}
+	if(front==-1){
+		//queue is empty
+		front = 0;
+		rear = 0;
+	}
+	else if(rear==size-1){
+		rear=0;
 	}
 	else{
-		return false;
+		rear = rear+1;
+	}
+	arr[rear]=key;
+}
+void Deque::insertfront(int key){
+	if(isFull()){
+		cout<<"Deque is Full\n";
+		return;
+	}
+	
+	if(front==-1){
+		front = 0;
+		rear = 0;
+	}
+	else if(front==0){
+		front = size-1;
+	}
+	else{
+		front = front - 1;
+	}
+	
+	arr[front]=key;
+}
+void Deque::deletefront(){
+	if(isEmpty()){
+		cout<<"Deque is empty\n";
+		return;
+	}
+	if(front==rear){
+		front=rear=-1;
+	}
+	else if(front==size-1){
+		front=0;
+	}
+	else{
+		front = front+1;
 	}
 }
-bool Deque::isFull(){
-	if(f==0 and r==size-1 ){
-		return true;
+void Deque::deleterear(){
+	if(isEmpty()){
+		cout<<"Deque is empty\n";
+		return;
 	}
-	else if((r+1)==f){
-		return true;
+	if(front==rear){
+		front=rear=-1;
+	}
+	else if(rear==0){
+		rear = size-1;
 	}
 	else{
-		return false;
+		rear = rear-1;
 	}
 }
 int Deque::getFront(){
 	if(isEmpty()){
-		cout<<"Queue is empty\n";
+		cout<<"Deque is empty\n";
 		return INT_MAX;
 	}
-	else{
-		return arr[f];
-	}
+	return arr[front];
 }
 int Deque::getRear(){
 	if(isEmpty()){
-		cout<<"Queue is empty\n";
+		cout<<"Deque is empty\n";
 		return INT_MAX;
 	}
-	else{
-		return arr[r];
-	}
+	return arr[rear];
 }
-void Deque::insertRear(int x){
-	if(isFull()){
-		cout<<"Can't insert Queue is full\n";
-		return;
-	}
-	if(isEmpty()){
-		f=0;
-		r=0;
-	}
-	else if(r==size-1){
-		r=0;
-	}
-	else{
-		r=r+1;
-	}
-	arr[r]=x;
+bool Deque::isEmpty(){
+	return front==-1;
 }
-void Deque::deleteFront(){
-	if(isEmpty()){
-		cout<<"Can't delete Queue is empty\n";
-		return;
-	}
-	if(f==r){
-		f=-1;
-		r=-1;
-	}
-	else if(f==size-1){
-		f=0;
-	}
-	else{
-		f=f+1;
-	}
-}
-void Deque::deleteRear(){
-	if(isEmpty()){
-		cout<<"Can't delete Queue is empty\n";
-		return;
-	}
-	if(f==r){
-		f=-1;
-		r=-1;
-	}
-	else if(r==0){
-		r=size-1;
-	}
-	else{
-		r=r-1;
-	}
-}
-void Deque::insertFront(int x){
-	if(isFull()){
-		cout<<"Can't insert Queue is Full"<<endl;
-		return;
-	}
-	if(f==-1 and r==-1){
-		f=0;
-		r=0;
-	}
-	else if(f==0){
-		f=size-1;
-	}
-	else{
-		f=f-1;
-	}
-	arr[f]=x;
+bool Deque::isFull(){
+	return (front==0 && rear==size-1) || (front==rear+1);
 }
 int main(){
-	Deque q(5);
-	cout<<q.isEmpty()<<endl;
+	Deque dq(5);
+	cout<<dq.isEmpty()<<endl;//1
+	cout<<dq.isFull()<<endl;//0;
 	
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.insertfront(10);
+	dq.insertrear(20);
 	
-	q.insertFront(2);
-	q.insertRear(10);
+	cout<<dq.getFront()<<endl;//10
+	cout<<dq.getRear()<<endl;//20
 	
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.insertfront(30);
+	dq.insertrear(40);
 	
-	q.insertFront(-1);
-	q.insertRear(20);
+	cout<<dq.getFront()<<endl;//30
+	cout<<dq.getRear()<<endl; //40
 	
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.insertfront(50);
 	
-	q.insertFront(5);
+	dq.insertfront(60);//full
 	
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	cout<<dq.isFull()<<endl;//1
 	
-	cout<<q.isFull()<<endl;
-	//these will cause overflow
-	q.insertFront(3);
-	q.insertRear(7);
+	cout<<dq.getFront()<<endl;//50
+	cout<<dq.getRear()<<endl;//40
 	
-	q.deleteFront();
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
-	//now it is ok
-	q.insertFront(3);
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.deletefront();
+	dq.deletefront();
 	
-	q.deleteRear();
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	cout<<dq.getFront()<<endl;//10
 	
-	q.deleteRear();
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.deleterear();
+	dq.deleterear();
 	
-	q.deleteFront();
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	cout<<dq.getRear()<<endl;//10
 	
-	q.deleteFront();
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	dq.deletefront();
 	
-	q.deleteRear();
+	cout<<dq.getFront()<<endl;//empty
 	
-	cout<<q.getFront()<<endl;
-	cout<<q.getRear()<<endl;
+	cout<<dq.isEmpty()<<endl;//true
 	
-	cout<<q.isEmpty()<<endl;
 }
